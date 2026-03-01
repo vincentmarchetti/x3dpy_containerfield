@@ -1,6 +1,6 @@
 # x3dpy_containerfield
 
-## release-0-9-0
+## release-1-0-0
 The release contains the following items:
 
 ### `x3d.py`
