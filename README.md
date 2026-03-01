@@ -1,5 +1,16 @@
 # x3dpy_containerfield
 
+## release-0-9-0
+The release contains the following items:
+
+### `x3d.py`
+This is a Python package derived from the x3d package as distributed from PyPI at https://pypi.org/project/x3d/ . The version emits an appropriate containerField XML attribute when the default attribute as defined in the XML DTD is overridden.
+
+### `X3duomToX3dPythonPackage_diff.txt` 
+
+A diff generated patch file documenting the change in the X3duomToX3dPythonPackage.xslt stylesheet between the initial commit of this repository, a copy of subversion hosted file at https://svn.code.sf.net/p/x3d/code/www.web3d.org/x3d/stylesheets/X3duomToX3dPythonPackage.xslt@38473 and the release tag.
+
+## Description
 The purpose of this repository is to create a patch for the existing code for the x3d package, as deployed as PyPI; that will enable the x3d.py to write appropriate containerField attributes when generating an XML encoding of a Python-based X3D scene.
 
  
