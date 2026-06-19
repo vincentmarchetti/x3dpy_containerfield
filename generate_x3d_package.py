@@ -31,7 +31,7 @@ command = [
     "-Djdk.xml.totalEntitySizeLimit=%i" % (200000,),
     "net.sf.saxon.Transform",
     "-dtd:off",
-    "-s:%s/specifications/X3dUnifiedObjectModel-4.0.xml" % SCRIPT_DIR,
+    "-s:%s/specifications/X3dUnifiedObjectModel-4.1.xml" % SCRIPT_DIR,
     "-xsl:%s/x3d/stylesheets/X3duomToX3dPythonPackage.xslt" % SCRIPT_DIR,
     "X3dPackageDirectory=%s" % PACKAGE_DIR
 ]
