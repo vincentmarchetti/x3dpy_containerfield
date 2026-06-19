@@ -215,7 +215,9 @@ except:
 """
 The x3d.py Python X3D Package supports programmers with Python interfaces and objects for standards-based X3D programming, all as open source.
 
-This work is part of the X3D Python Scene Access Interface Library (X3DPSAIL).
+This module is build version ### for the X3D Python Scene Access Interface Library (X3DPSAIL).
+  
+Latest release available at https://pypi.org/project/x3d
 """
 
 # Include regular expression (regex) library: re is built into Python
@@ -235,6 +237,48 @@ _DEBUG = False       # options True False
         <xsl:for-each select="//SimpleTypeEnumerations/SimpleType[count(enumeration) > 0]
                                 [not(starts-with(@name,'containerField')) and not(ends-with(@name,'AccessTypes'))]">
             <xsl:text>&#10;</xsl:text>
+            <xsl:if test="(@name = 'componentNameChoices')">
+              <xsl:text># TODO consider making immutable as read-only properties within class component
+# https://stackoverflow.com/questions/802578/in-python-how-can-i-make-unassignable-attributes-like-ones-marked-with-final
+
+COMPONENTNAME_Core                 = 'Core'
+COMPONENTNAME_CADGeometry          = 'CADGeometry'
+COMPONENTNAME_CubeMapTexturing     = 'CubeMapTexturing'
+COMPONENTNAME_EnvironmentalEffects = 'EnvironmentalEffects'
+COMPONENTNAME_EnvironmentalSensor  = 'EnvironmentalSensor'
+COMPONENTNAME_EventUtilities       = 'EventUtilities'
+COMPONENTNAME_Followers            = 'Followers'
+COMPONENTNAME_Geometry2D           = 'Geometry2D'
+COMPONENTNAME_Geometry3D           = 'Geometry3D'
+COMPONENTNAME_Geospatial           = 'Geospatial'
+COMPONENTNAME_Grouping             = 'Grouping'
+COMPONENTNAME_HAnim                = 'HAnim'
+COMPONENTNAME_Interpolation        = 'Interpolation'
+COMPONENTNAME_KeyDeviceSensor      = 'KeyDeviceSensor'
+COMPONENTNAME_Layering             = 'Layering'
+COMPONENTNAME_Layout               = 'Layout'
+COMPONENTNAME_Lighting             = 'Lighting'
+COMPONENTNAME_Navigation           = 'Navigation'
+COMPONENTNAME_Networking           = 'Networking'
+COMPONENTNAME_NURBS                = 'NURBS'
+COMPONENTNAME_ParticleSystems      = 'ParticleSystems'
+COMPONENTNAME_Picking              = 'Picking'
+COMPONENTNAME_PointingDeviceSensor = 'PointingDeviceSensor'
+COMPONENTNAME_TextureProjection    = 'TextureProjection'
+COMPONENTNAME_Rendering            = 'Rendering'
+COMPONENTNAME_RigidBodyPhysics     = 'RigidBodyPhysics'
+COMPONENTNAME_Scripting            = 'Scripting'
+COMPONENTNAME_Shaders              = 'Shaders'
+COMPONENTNAME_Shape                = 'Shape'
+COMPONENTNAME_Sound                = 'Sound'
+COMPONENTNAME_Text                 = 'Text'
+COMPONENTNAME_Texturing            = 'Texturing'
+COMPONENTNAME_Texturing3D          = 'Texturing3D'
+COMPONENTNAME_Time                 = 'Time'
+COMPONENTNAME_VolumeRendering      = 'VolumeRendering'
+</xsl:text>
+              
+            </xsl:if>
             <xsl:value-of select="upper-case(@name)"/>
             <xsl:text> = (</xsl:text>
             <xsl:choose>
@@ -675,12 +719,8 @@ class Comment(_X3DStatement):
             value = SFString.DEFAULT_VALUE()
         self.__value = str(value)
     # output function - - - - - - - - - -
-    def XML(self, indentLevel=0, syntax="XML", containerField=None):
-        """ <!-- XML comments are wrapped in special delimiters -->
-            The containerField attribute is added for compatibility
-            when this comment is being emitted to XML as part of an MFNode
-            value. The value of containerField is ignored in emitted XML
-            fragment """
+    def XML(self, indentLevel=0, syntax="XML"):
+        """ <!-- XML comments are wrapped in special delimiters --> """
         result = ''
         indent = '  ' * indentLevel
         if self.value:
@@ -735,7 +775,7 @@ def isX3DNode(value):
 # TODO how to introspect the version number at run time from the object. Specifically,
 # get the magic dictionary __dict__ and then perform standard dictionary lookups on that version key.
 
-print("x3d.py package 4.0.65.0 loaded, have fun with X3D Graphics!", flush=True)
+print("x3d.py package 4.0.65.3 loaded, have fun with X3D Graphics!", flush=True)
 
 ###############################################
 </xsl:text>
@@ -3015,13 +3055,6 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         <xsl:value-of select="InterfaceDefinition/@specificationUrl"/>
         <xsl:text>'
     @classmethod
-    def CONTAINERFIELD_DEFAULT(cls):
-        """ Default value for containerField attribute in XML encoding """
-        return '</xsl:text>
-        <xsl:value-of select="InterfaceDefinition/containerField/@default"/>
-        <xsl:text>'</xsl:text>
-        <xsl:text>
-    @classmethod
     def TOOLTIP_URL(cls):
         """ X3D Tooltips provide authoring tips, hints and warnings for each node and field in X3D. </xsl:text>
         <xsl:text>https://www.web3d.org/x3d/tooltips/X3dTooltips.html#</xsl:text>
@@ -3711,7 +3744,8 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
             for each in </xsl:text>
                         <xsl:value-of select="$fieldName"/>
                         <xsl:text>:
-                assertValidFieldInitializationValue(each.name, </xsl:text>
+                if not Comment:
+                    assertValidFieldInitializationValue(each.name, </xsl:text>
                         <xsl:choose>
                             <xsl:when test="($fieldName = 'fieldValue')">
                                 <xsl:text>type(each.value), each.value, parent='fieldValue'</xsl:text><!-- fieldValue and ExternProtoDeclare/field have no local type information -->
@@ -3899,7 +3933,7 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         <!-- XML() functions -->
         <xsl:text>
     # output function - - - - - - - - - -
-    def XML(self, indentLevel=0 , syntax="XML", containerField=None):
+    def XML(self, indentLevel=0, syntax="XML"):
         """ Provide Canonical X3D output serialization using XML encoding (usable for .x3d file suffix). """
         result = ''
         indent = '  ' * indentLevel</xsl:text>
@@ -4016,9 +4050,7 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         result += '<]]></xsl:text>
                 <!-- opening tag is unclosed since followed by attributes -->
                 <xsl:value-of select="$elementName"/>
-                <xsl:text>'
-        if (containerField is not None and self.CONTAINERFIELD_DEFAULT() != '') and (self.CONTAINERFIELD_DEFAULT() != containerField):
-            result += " containerField='" + containerField + "'"</xsl:text>
+                <xsl:text>'</xsl:text>
                 <!-- opening tag is unclosed since followed by attributes -->
                 <!-- output simple-type fields as XML attributes -->
                 <xsl:for-each select="$allFields[not(contains(@type,'Node')) and not(@name = 'sourceCode')]">
@@ -4066,6 +4098,11 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                             </xsl:if>
                         </xsl:if>
                         <xsl:choose>
+                            <xsl:when test="(@use = 'required')">
+                                <xsl:text>True: # </xsl:text>
+                                <xsl:value-of select="$fieldName"/>
+                                <xsl:text> is a required field</xsl:text>
+                            </xsl:when>
                             <xsl:when test="(@type = 'SFBool')">
                                 <xsl:if test="(@default = 'true')">
                                     <xsl:text>not </xsl:text>
@@ -4307,9 +4344,7 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                         <xsl:text>: # output this SFNode
                 result += self.</xsl:text>
                         <xsl:value-of select="$fieldName"/>
-                        <xsl:text>.XML(indentLevel=indentLevel+1, syntax=syntax, containerField='</xsl:text>
-                        <xsl:value-of select="$fieldName"/>
-                        <xsl:text>')</xsl:text>
+                        <xsl:text>.XML(indentLevel=indentLevel+1, syntax=syntax)</xsl:text>
                                     </xsl:when>
                                     <xsl:otherwise>
                         <!-- ## result += indent + '  ' + 'TODO iterate over each child element' + '\n' -->
@@ -4330,9 +4365,7 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                 for each in self.</xsl:text>
                         <xsl:value-of select="$fieldName"/>
                         <xsl:text>:
-                    result += each.XML(indentLevel=indentLevel+1, syntax=syntax, containerField='</xsl:text>
-                        <xsl:value-of select="$fieldName"/>
-                        <xsl:text>')</xsl:text>
+                    result += each.XML(indentLevel=indentLevel+1, syntax=syntax)</xsl:text>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>
@@ -4448,6 +4481,11 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                             </xsl:if>
                         </xsl:if>
                         <xsl:choose>
+                            <xsl:when test="(@use = 'required')">
+                                <xsl:text>True: # </xsl:text>
+                                <xsl:value-of select="$fieldName"/>
+                                <xsl:text> is a required field </xsl:text>
+                            </xsl:when>
                             <xsl:when test="(@type = 'SFBool')">
                                 <xsl:if test="(@default = 'true')">
                                     <xsl:text>not </xsl:text>
@@ -4803,6 +4841,11 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                             </xsl:if>
                         </xsl:if>
                         <xsl:choose>
+                            <xsl:when test="(@use = 'required')">
+                                <xsl:text>True: # </xsl:text>
+                                <xsl:value-of select="$fieldName"/>
+                                <xsl:text> is a required field </xsl:text>
+                            </xsl:when>
                             <xsl:when test="(@type = 'SFBool')">
                                 <xsl:if test="(@default = 'true')">
                                     <xsl:text>not </xsl:text>
