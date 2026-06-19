@@ -719,8 +719,12 @@ class Comment(_X3DStatement):
             value = SFString.DEFAULT_VALUE()
         self.__value = str(value)
     # output function - - - - - - - - - -
-    def XML(self, indentLevel=0, syntax="XML"):
-        """ <!-- XML comments are wrapped in special delimiters --> """
+    def XML(self, indentLevel=0, syntax="XML", containerField=None):
+        """ <!-- XML comments are wrapped in special delimiters -->
+            The containerField attribute is added for compatibility
+            when this comment is being emitted to XML as part of an MFNode
+            value. The value of containerField is ignored in emitted XML
+            fragment """
         result = ''
         indent = '  ' * indentLevel
         if self.value:
@@ -3055,6 +3059,13 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         <xsl:value-of select="InterfaceDefinition/@specificationUrl"/>
         <xsl:text>'
     @classmethod
+    def CONTAINERFIELD_DEFAULT(cls):
+        """ Default value for containerField attribute in XML encoding """
+        return '</xsl:text>
+        <xsl:value-of select="InterfaceDefinition/containerField/@default"/>
+        <xsl:text>'</xsl:text>
+        <xsl:text>
+    @classmethod
     def TOOLTIP_URL(cls):
         """ X3D Tooltips provide authoring tips, hints and warnings for each node and field in X3D. </xsl:text>
         <xsl:text>https://www.web3d.org/x3d/tooltips/X3dTooltips.html#</xsl:text>
@@ -3933,7 +3944,7 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         <!-- XML() functions -->
         <xsl:text>
     # output function - - - - - - - - - -
-    def XML(self, indentLevel=0, syntax="XML"):
+    def XML(self, indentLevel=0 , syntax="XML", containerField=None):
         """ Provide Canonical X3D output serialization using XML encoding (usable for .x3d file suffix). """
         result = ''
         indent = '  ' * indentLevel</xsl:text>
@@ -4050,7 +4061,9 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
         result += '<]]></xsl:text>
                 <!-- opening tag is unclosed since followed by attributes -->
                 <xsl:value-of select="$elementName"/>
-                <xsl:text>'</xsl:text>
+                <xsl:text>'
+        if (containerField is not None and self.CONTAINERFIELD_DEFAULT() != '') and (self.CONTAINERFIELD_DEFAULT() != containerField):
+            result += " containerField='" + containerField + "'"</xsl:text>
                 <!-- opening tag is unclosed since followed by attributes -->
                 <!-- output simple-type fields as XML attributes -->
                 <xsl:for-each select="$allFields[not(contains(@type,'Node')) and not(@name = 'sourceCode')]">
@@ -4344,7 +4357,9 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                         <xsl:text>: # output this SFNode
                 result += self.</xsl:text>
                         <xsl:value-of select="$fieldName"/>
-                        <xsl:text>.XML(indentLevel=indentLevel+1, syntax=syntax)</xsl:text>
+                        <xsl:text>.XML(indentLevel=indentLevel+1, syntax=syntax, containerField='</xsl:text>
+                        <xsl:value-of select="$fieldName"/>
+                        <xsl:text>')</xsl:text>
                                     </xsl:when>
                                     <xsl:otherwise>
                         <!-- ## result += indent + '  ' + 'TODO iterate over each child element' + '\n' -->
@@ -4365,7 +4380,9 @@ def assertValidFieldInitializationValue(name, fieldType, value, parent=''):
                 for each in self.</xsl:text>
                         <xsl:value-of select="$fieldName"/>
                         <xsl:text>:
-                    result += each.XML(indentLevel=indentLevel+1, syntax=syntax)</xsl:text>
+                    result += each.XML(indentLevel=indentLevel+1, syntax=syntax, containerField='</xsl:text>
+                        <xsl:value-of select="$fieldName"/>
+                        <xsl:text>')</xsl:text>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>
